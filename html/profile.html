@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Profile - Media Player</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      display: flex;
+      background: #1e1e2f;
+      color: #f5f5f5;
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: #2b2b3d;
+      transition: 0.3s ease;
+      padding: 20px;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar.hide {
+      left: -240px;
+    }
+
+    .sidebar h2 {
+      font-size: 22px;
+      margin-bottom: 30px;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar ul li {
+      margin: 15px 0;
+    }
+
+    .sidebar ul li a {
+      text-decoration: none;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .sidebar ul li a:hover {
+      background: #41415a;
+    }
+
+    .sidebar ul li a .icon {
+      margin-right: 10px;
+    }
+
+    .icon {
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      position: relative;
+    }
+
+    .icon::before,
+    .icon::after {
+      content: '';
+      position: absolute;
+    }
+
+    /* Home icon */
+    .icon[data-icon="home"]::before {
+      border: 1px solid #fff;
+      border-top: none;
+      width: 12px;
+      height: 8px;
+      top: 10px;
+      left: 3px;
+    }
+
+    .icon[data-icon="home"]::after {
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid #fff;
+      top: 2px;
+      left: 6px;
+    }
+
+    /* Music note */
+    .icon[data-icon="music"]::before {
+      background: #fff;
+      width: 4px;
+      height: 12px;
+      top: 3px;
+      left: 7px;
+      border-radius: 2px 2px 0 0;
+    }
+
+    .icon[data-icon="music"]::after {
+      background: #fff;
+      width: 8px;
+      height: 4px;
+      top: 6px;
+      left: 5px;
+      border-radius: 50%;
+    }
+
+    /* Playlist (list) */
+    .icon[data-icon="playlist"]::before {
+      background: #fff;
+      width: 12px;
+      height: 2px;
+      top: 4px;
+      box-shadow: 0 4px 0 0 #fff, 0 8px 0 0 #fff;
+    }
+
+    /* Stream (play) */
+    .icon[data-icon="stream"]::before {
+      border-left: 8px solid #fff;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      left: 5px;
+      top: 4px;
+    }
+
+    /* Settings (gear) */
+    .icon[data-icon="settings"]::before {
+      background: #fff;
+      width: 2px;
+      height: 2px;
+      top: 8px;
+      left: 8px;
+      box-shadow: 0 -6px 0 0 #fff, 0 6px 0 0 #fff, -6px 0 0 0 #fff, 6px 0 0 0 #fff;
+    }
+
+    .icon[data-icon="settings"]::after {
+      border: 2px solid #fff;
+      border-radius: 50%;
+      width: 10px;
+      height: 10px;
+      top: 4px;
+      left: 4px;
+    }
+
+    /* Feedback (speech bubble) */
+    .icon[data-icon="feedback"]::before {
+      border: 1px solid #fff;
+      border-radius: 4px;
+      width: 10px;
+      height: 8px;
+      top: 2px;
+      left: 4px;
+    }
+
+    .icon[data-icon="feedback"]::after {
+      border-left: 3px solid transparent;
+      border-right: 3px solid transparent;
+      border-top: 3px solid #fff;
+      top: 10px;
+      left: 7px;
+    }
+
+    /* About (info) */
+    .icon[data-icon="about"]::before {
+      border: 1px solid #fff;
+      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      top: 3px;
+      left: 3px;
+    }
+
+    .icon[data-icon="about"]::after {
+      content: 'i';
+      color: #fff;
+      font-size: 8px;
+      font-weight: bold;
+      top: 4px;
+      left: 8px;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      left: 240px;
+      right: 0;
+      height: 60px;
+      background: #2f2f46;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 25px;
+      transition: 0.3s;
+    }
+
+    .sidebar.hide ~ .navbar {
+      left: 0;
+    }
+
+    .navbar .menu-btn {
+      font-size: 24px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      color: white;
+    }
+
+    .navbar .profile {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .navbar .profile img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+
+    /* Main content */
+    .main {
+      margin-left: 240px;
+      margin-top: 60px;
+      padding: 30px;
+      width: 100%;
+      transition: 0.3s;
+    }
+
+    .sidebar.hide ~ .main {
+      margin-left: 0;
+    }
+
+    .main h1 {
+      font-size: 26px;
+      margin-bottom: 20px;
+    }
+
+    .profile-section {
+      background: #2e2e42;
+      border-radius: 12px;
+      padding: 30px;
+      max-width: 600px;
+      margin: 0 auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .profile-display {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .profile-display img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      margin-bottom: 15px;
+      border: 3px solid #41415a;
+    }
+
+    .profile-display h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .change-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .change-form label {
+      font-weight: 600;
+    }
+
+    .change-form input[type="file"] {
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #41415a;
+      color: #f5f5f5;
+    }
+
+    .change-form button {
+      padding: 12px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .change-form button:hover {
+      background: #0056b3;
+    }
+
+    .back-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #6c757d;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      transition: 0.3s;
+    }
+
+    .back-btn:hover {
+      background: #5a6268;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        left: -240px;
+      }
+      .sidebar.hide {
+        left: 0;
+      }
+      .navbar {
+        left: 0;
+      }
+      .main {
+        margin-left: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar" id="sidebar">
+    <h2>MediaPlayer</h2>
+    <ul>
+      <li><a href="dashboard.html"><span class="icon" data-icon="home"></span> Dashboard</a></li>
+      <li><a href="#"><span class="icon" data-icon="music"></span> music</a></li>
+      <li><a href="playlist.html"><span class="icon" data-icon="playlist"></span> playlist</a></li>
+      <li><a href="stream.html"><span class="icon" data-icon="stream"></span> stream</a></li>
+      <li><a href="settings.html"><span class="icon" data-icon="settings"></span> Pengaturan</a></li>
+      <li><a href="feedback.html"><span class="icon" data-icon="feedback"></span> umpan balik</a></li>
+      <li><a href="about.html"><span class="icon" data-icon="about"></span> tentang kami</a></li>
+    </ul>
+  </div>
+
+  <div class="navbar" id="navbar">
+    <button class="menu-btn" id="toggleBtn">☰</button>
+    <div class="profile" onclick="window.location.href='profile.html'">
+      <img id="navbarProfileImg" src="../img/img profile/default profile.jpeg" alt="User">
+      <span id="navbarProfileName">Daelingka</span>
+    </div>
+  </div>
+
+  <div class="main" id="main">
+    <h1>Profil Pengguna</h1>
+    <div class="profile-section">
+      <div class="profile-display">
+        <img id="profileImg" src="../img/img profile/default profile.jpeg" alt="Profile Picture">
+        <h2 id="profileName">Daelingka</h2>
+      </div>
+      <form class="change-form" id="changeForm">
+        <label for="profilePic">Pilih Gambar Profil Baru:</label>
+        <input type="file" id="profilePic" accept="image/*">
+        <button type="submit">Simpan Perubahan</button>
+      </form>
+      <a href="dashboard.html" class="back-btn">Kembali ke Dashboard</a>
+    </div>
+  </div>
+
+  <script>
+    const toggleBtn = document.getElementById('toggleBtn');
+    const sidebar = document.getElementById('sidebar');
+    const changeForm = document.getElementById('changeForm');
+    const profileImg = document.getElementById('profileImg');
+    const navbarProfileImg = document.getElementById('navbarProfileImg');
+    const profileName = document.getElementById('profileName');
+    const navbarProfileName = document.getElementById('navbarProfileName');
+    const profilePicInput = document.getElementById('profilePic');
+
+    // Load saved profile from localStorage
+    function loadProfile() {
+      const savedImg = localStorage.getItem('profileImg');
+      const savedName = localStorage.getItem('profileName');
+      if (savedImg) {
+        profileImg.src = savedImg;
+        navbarProfileImg.src = savedImg;
+      } else {
+        profileImg.src = '../img/img profile/default profile.jpeg';
+        navbarProfileImg.src = '../img/img profile/default profile.jpeg';
+      }
+      if (savedName) {
+        profileName.textContent = savedName;
+        navbarProfileName.textContent = savedName;
+      }
+    }
+
+    // Save profile to localStorage
+    function saveProfile(imgSrc, name) {
+      localStorage.setItem('profileImg', imgSrc);
+      localStorage.setItem('profileName', name);
+    }
+
+    // Handle form submission
+    changeForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const file = profilePicInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const imgSrc = e.target.result;
+          profileImg.src = imgSrc;
+          navbarProfileImg.src = imgSrc;
+          saveProfile(imgSrc, profileName.textContent);
+          alert('Profil berhasil diperbarui!');
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Silakan pilih gambar terlebih dahulu.');
+      }
+    });
+
+    // Toggle sidebar
+    toggleBtn.onclick = () => {
+      sidebar.classList.toggle('hide');
+    };
+
+    // Load profile on page load
+    loadProfile();
+  </script>
+
+</body>
+</html>
